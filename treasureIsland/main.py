@@ -24,24 +24,26 @@ questions = {
 }
 
 
-def make_question(question):
+def ask_question(question):
     if "gameover" in question:
-        print(question["gameover"])
-        return
+        return print(question["gameover"])
 
     answer = input(question["question"])
+
+    if answer == "exit":
+        return print("Goodbye!")
     if answer in question["options"]:
-        return make_question(question["options"][answer])
+        return ask_question(question["options"][answer])
     else:
         print("bad answer")
-        return make_question(question)
+        return ask_question(question)
 
 
 def main():
     if __name__ == "__main__":
         print("Welcome to Treasure Island")
         print("Your mission is to find the treasure")
-        make_question(questions)
+        ask_question(questions)
 
 
 main()
