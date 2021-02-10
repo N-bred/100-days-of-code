@@ -1,3 +1,8 @@
+import time
+import sys
+import os
+
+
 def print_maze(maze):
     s = ""
     for row in maze:
@@ -70,6 +75,14 @@ def check_around(pos, maze):
     return points
 
 
+def replace_in_line(string, rep, pos, row_length):
+    y, x = pos
+    index = y * row_length + x + y
+    l = list(string)
+    l[index] = rep
+    return "".join(l)
+
+
 maze = [
     [0, 0, 0, 0, 1, 1, 1],
     [0, 1, 1, 0, 1, 0, 0],
@@ -80,8 +93,38 @@ maze = [
     [1, 1, 1, 1, 1, 1, 1],
 ]
 
-initial_pos = (4, 4)
-final_pos = (1, 6)
+
+def main():
+    if __name__ == "__main__":
+        initial_pos = (5, 0)
+        final_pos = (1, 6)
+        #######################
+
+        old_pos = initial_pos
+        middle_pos = 0
+        current_pos = initial_pos
+
+        maze_str = print_maze(maze)
+        maze_str = replace_in_line(maze_str, "-", initial_pos, len(maze[0]))
+        print("\r" + maze_str, end="")
+
+        while current_pos != final_pos:
+
+            middle_pos = current_pos
+            current_pos = check_around(current_pos, maze)
+
+            if old_pos in current_pos:
+                current_pos.remove(old_pos)
+                old_pos = middle_pos
+
+            if len(current_pos) == 1:
+                current_pos = current_pos[0]
+
+            maze_str = replace_in_line(maze_str, "-", current_pos, len(maze[0]))
+
+            time.sleep(0.5)
+            print(f"{maze_str}", end="\r")
+            sys.stdout.flush()
 
 
-print(check_around(initial_pos, maze))
+main()
