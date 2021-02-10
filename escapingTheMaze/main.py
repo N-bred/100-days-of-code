@@ -57,7 +57,7 @@ def lookup(pos, maze, left=True, up=True, right=True, down=True):
 def check_around(pos, maze):
     y, x = pos
 
-    corner = has_corners((y, x), (7, 7))
+    corner = has_corners((y, x), (len(maze), len(maze[0])))
 
     points = []
 
@@ -84,31 +84,33 @@ def replace_in_line(string, rep, pos, row_length):
 
 
 maze = [
-    [0, 0, 0, 0, 1, 1, 1],
-    [0, 1, 1, 0, 1, 0, 0],
-    [0, 1, 1, 0, 1, 0, 1],
-    [0, 1, 1, 0, 1, 0, 1],
-    [0, 1, 1, 0, 0, 0, 1],
-    [0, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1],
+    [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+    [0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1],
+    [0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1],
+    [0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1],
+    [0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1],
+    [0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1],
 ]
 
 
 def main():
     if __name__ == "__main__":
         initial_pos = (5, 0)
-        final_pos = (1, 6)
-        #######################
-
+        final_pos = (0, 12)
+        rep = "-"
         old_pos = initial_pos
         middle_pos = 0
         current_pos = initial_pos
 
         maze_str = print_maze(maze)
-        maze_str = replace_in_line(maze_str, "-", initial_pos, len(maze[0]))
-        print("\r" + maze_str, end="")
+        maze_str = replace_in_line(maze_str, rep, initial_pos, len(maze[0]))
 
         while current_pos != final_pos:
+
+            print(maze_str)
+            time.sleep(0.1)
+            os.system("cls")
 
             middle_pos = current_pos
             current_pos = check_around(current_pos, maze)
@@ -120,11 +122,9 @@ def main():
             if len(current_pos) == 1:
                 current_pos = current_pos[0]
 
-            maze_str = replace_in_line(maze_str, "-", current_pos, len(maze[0]))
+            maze_str = replace_in_line(maze_str, rep, current_pos, len(maze[0]))
 
-            time.sleep(0.5)
-            print(f"{maze_str}", end="\r")
-            sys.stdout.flush()
+        print(maze_str)
 
 
 main()
