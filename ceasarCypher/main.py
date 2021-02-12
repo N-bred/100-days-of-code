@@ -3,19 +3,10 @@ def cypher_encode(string, shift):
     encoded = []
 
     for char in list_str:
-        code = ord(char)
-        if 97 <= code <= 122:
-            if code + shift > 122:
-                code = 96 + shift
-            else:
-                code += shift
-        elif 65 <= code <= 90:
-            if code + shift > 90:
-                code = 64 + shift
-            else:
-                code += shift
-
-        encoded.append(chr(code))
+        if char.isupper():
+            encoded.append(chr(((ord(char) + shift - 65) % 26 + 65)))
+        else:
+            encoded.append(chr(((ord(char) + shift - 97) % 26 + 97)))
 
     return "".join(encoded)
 
@@ -24,18 +15,11 @@ def cypher_decode(string, shift):
     list_str = list(string)
     decoded = []
     for char in list_str:
-        code = ord(char)
-        if 97 <= code <= 122:
-            if code - shift < 97:
-                code = 123 - shift
-            else:
-                code -= shift
-        elif 65 <= code <= 90:
-            if code - shift < 65:
-                code = 91 - shift
-            else:
-                code -= shift
-        decoded.append(chr(code))
+        if char.isupper():
+            decoded.append(chr(((ord(char) - shift - 65) % 26 + 65)))
+        else:
+            decoded.append(chr(((ord(char) - shift - 97) % 26 + 97)))
+
     return "".join(decoded)
 
 
@@ -61,7 +45,7 @@ def main():
 
         repeat = input("Do you want to try again? Yes or No: ")
 
-        if repeat == "Yes":
+        if repeat.lower() == "yes":
             return main()
         return
 
