@@ -17,7 +17,7 @@ def calculate_result(players_cards, cards):
     return result
 
 
-def compute_victory(player_cards, computer_cards, cards):
+def compute_victory(player_cards, computer_cards, cards, is_skipped=False):
     player_result = calculate_result(player_cards, cards)
     computer_result = calculate_result(computer_cards, cards)
 
@@ -29,18 +29,20 @@ def compute_victory(player_cards, computer_cards, cards):
         return"You win"
     elif computer_result == 21 and player_result != 21:
         return"Computer wins"
-    elif player_result > 21:
+    elif player_result > 21 and computer_result < 21:
         return"Computer wins"
-    elif computer_result > 21:
+    elif computer_result > 21 and player_result < 21:
         return"You win"
-    elif 21 > player_result > computer_result:
-        return "You win"
-    elif 21 > computer_result > player_result:
-        return "Computer wins"
-    elif player_result < 21 and computer_result < 21:
-        if player_result == computer_result:
-            return "Draw"
-        return False
+
+
+    if player_result < 21 and computer_result < 21:
+        if is_skipped:
+            if player_result > computer_result:
+                return "You win"
+            else:
+                return "Computer wins"
+
+    return False
 
 
 
@@ -71,20 +73,23 @@ def main():
             if confirmation == 'y':
                 player_cards.append(pick_a_card(cards))
 
+
             if calculate_result(computer_cards, GLOBAL_CARDS) <= 10:
                 computer_cards.append(pick_a_card(cards))
 
-            result = compute_victory(player_cards, computer_cards, GLOBAL_CARDS)
+            result = compute_victory(player_cards, computer_cards, GLOBAL_CARDS, skipped)
+
+            
+
+
+            if confirmation == 'n':
+                skipped = True
 
             if result is not False :
                 is_running = False
                 return print(result)
-            else:
-                if skipped == True:
-                    is_running = False
-                    return print(result)
-                else:
-                    skipped = True
+            
+                
 
 
             
