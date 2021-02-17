@@ -9,8 +9,6 @@ def main():
         initial_number = int(input("Type the initial range as a number: "))
         final_number = int(input("Type the final range as a number: "))
 
-        lifes = 0
-
         if difficulty.lower() == "easy":
             lifes = 10
         elif difficulty.lower() == "hard":
@@ -29,9 +27,9 @@ def main():
                 return print(f"You guessed it! Magic number was: {magic_number}")
 
             if input_number < magic_number:
-                print("Number is lower than the magic number")
+                print("You're below from the magin number")
             else:
-                print("Number is higher than the magic number")
+                print("You;re above the magic number")
 
             lifes -= 1
 
