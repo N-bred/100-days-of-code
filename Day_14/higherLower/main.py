@@ -39,6 +39,8 @@ def main():
                     right_side = pick_random_item(data)
                 else:
                     break
+            else:
+                return print("Wrong option")
 
         return print(f"Your score was: {score}")
 
