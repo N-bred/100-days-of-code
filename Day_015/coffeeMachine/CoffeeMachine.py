@@ -1,4 +1,4 @@
-class Coffee_Machine(object):
+class Coffee_Machine:
     def __init__(self):
         self.water = 300
         self.milk = 200

@@ -7,6 +7,22 @@ from TerminalHandler import Terminal_Handler
 from CurrencyHandler import Currency_Handler
 
 
+def interact_with_machine_handler(coffee_machine_handler, current_coffee):
+    all_money = Terminal_Handler.get_money_from_input()
+    money = Currency_Handler.calculate_money(all_money)
+    result_from_transaction = coffee_machine_handler.handle_transaction(
+        money, current_coffee
+    )
+
+    if type(result_from_transaction) is list:
+        Terminal_Handler.log_errors_by_list(result_from_transaction)
+        print("You get your money refunded.")
+    elif type(result_from_transaction) is str:
+        change = Currency_Handler.calculate_change(money, current_coffee.cost)
+        print(result_from_transaction)
+        print(f"Your total change is: ${change}")
+
+
 def handling_loop(coffee_machine_handler, expresso, latte, capuccino):
     while True:
         answer = Terminal_Handler.handle_input(
@@ -28,20 +44,7 @@ def handling_loop(coffee_machine_handler, expresso, latte, capuccino):
                 Terminal_Handler.log_errors_by_list(["Wrong option"])
                 return handling_loop(coffee_machine_handler, expresso, latte, capuccino)
 
-            # Handle coffee transaction
-            all_money = Terminal_Handler.get_money_from_input()
-            money = Currency_Handler.calculate_money(all_money)
-            result_from_transaction = coffee_machine_handler.handle_transaction(
-                money, current_coffee
-            )
-
-            if type(result_from_transaction) is list:
-                Terminal_Handler.log_errors_by_list(result_from_transaction)
-                print("You get your money refunded.")
-            elif type(result_from_transaction) is str:
-                change = Currency_Handler.calculate_change(money, current_coffee.cost)
-                print(result_from_transaction)
-                print(f"Your total change is: ${change}")
+            interact_with_machine_handler(coffee_machine_handler, current_coffee)
 
 
 def main():
