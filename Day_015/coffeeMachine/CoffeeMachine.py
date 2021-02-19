@@ -4,6 +4,3 @@ class Coffee_Machine(object):
         self.milk = 200
         self.coffee = 100
         self.money = 0
-
-    def get_report(self):
-        return f"Water: {self.water}\nMilk: {self.milk}\nCoffee {self.coffee}\nMoney: ${self.money}"
