@@ -4,7 +4,9 @@ from food import Food
 from scoreboard import Scoreboard
 import time
 
-WIDTH, HEIGHT = 600, 600
+WIDTH, HEIGHT, TRESHOLD = 600, 600, 20
+w_distance = WIDTH / 2 - TRESHOLD
+h_distance = HEIGHT / 2 - TRESHOLD
 
 screen = Screen()
 screen.setup(WIDTH, HEIGHT)
@@ -33,6 +35,18 @@ while game_is_on:
         food.refresh()
         scoreboard.increase_score()
         scoreboard.write_score()
+
+    x_cor = snake.head.xcor()
+    y_cor = snake.head.ycor()
+
+    if (
+        x_cor > w_distance
+        or x_cor < -w_distance
+        or y_cor > h_distance
+        or y_cor < -h_distance
+    ):
+        game_is_on = False
+        scoreboard.game_over()
 
 
 screen.exitonclick()
