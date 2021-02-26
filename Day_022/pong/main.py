@@ -28,7 +28,7 @@ screen.onkeypress(l_paddle.go_down, "s")
 game_is_on = True
 
 while game_is_on:
-    time.sleep(0.04)
+    time.sleep(ball.move_speed)
     screen.update()
     ball.move()
 
@@ -41,6 +41,7 @@ while game_is_on:
         or ball.distance(l_paddle) < 50
         and ball.xcor() < -320
     ):
+
         ball.bounce_x()
 
     if ball.xcor() > 380:

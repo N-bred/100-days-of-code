@@ -20,9 +20,9 @@ class Scoreboard(Turtle):
     def set_scores(self):
         self.clear()
         self.goto(-100, 200)
-        self.write_score(l_score)
+        self.write_score(self.l_score)
         self.goto(100, 200)
-        self.write_score(r_score)
+        self.write_score(self.r_score)
 
     def l_point(self):
         self.set_scores()
