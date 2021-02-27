@@ -2,4 +2,5 @@ FONT = ("Courier", 24, "normal")
 
 
 class ScoreBoard:
-    pass
+    def __init__(self):
+        pass
