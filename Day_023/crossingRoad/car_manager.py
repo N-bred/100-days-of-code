@@ -31,3 +31,8 @@ class CarManager(Turtle):
     def level_up(self):
 
         self.car_speed += MOVE_INCREMENT
+
+    def reset(self):
+        for car in self.all_cars:
+            car.clear()
+            car.goto(random.randint(310, 500), car.ycor())
