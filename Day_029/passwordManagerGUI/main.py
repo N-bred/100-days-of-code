@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 import math
 from passwordGenerator import create_random_password
+import pyperclip
 
 WIDTH, HEIGHT = 200, 200
 
@@ -40,6 +41,10 @@ def save_password():
         file.close()
 
     clear_inputs()
+
+    pyperclip.copy(password)
+    messagebox.showinfo(
+        title="Copied!", message="Password copied to the clipboard!")
 
 
 def validate_inputs():
