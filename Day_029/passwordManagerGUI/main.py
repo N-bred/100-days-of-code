@@ -8,7 +8,10 @@ WIDTH, HEIGHT = 200, 200
 
 
 def generate_password():
-    random_password = create_random_password()
+    random_password = create_random_password(n_of_digits=int(length_of_password_input.get()),
+                                             allow_uppercase=allow_uppercase.get(),
+                                             allow_symbols=allow_symbols.get(),
+                                             allow_numbers=allow_numbers.get())
     password_input.delete(0, tk.END)
     password_input.insert(0, random_password)
 
@@ -29,6 +32,7 @@ def clear_inputs():
     email_input.delete(0, tk.END)
     password_input.delete(0, tk.END)
 
+
 # ---------------------------- UI SETUP ------------------------------- #
 
 
@@ -37,7 +41,6 @@ window.title = "Password Manager"
 window.config(padx=20, pady=20, bg="#ffffff")
 
 lock_image = tk.PhotoImage(file="logo.png")
-
 
 canvas = tk.Canvas(width=WIDTH, height=HEIGHT, bg="#ffffff")
 canvas.create_image(math.floor(WIDTH/2),
@@ -54,6 +57,9 @@ email_label.grid(column=0, row=2)
 password_label = tk.Label(text="Password")
 password_label.grid(column=0, row=3)
 
+length_of_password = tk.Label(text="Length of Password")
+length_of_password.grid(column=0, row=4)
+
 # Entries
 website_input = tk.Entry(width=35)
 website_input.grid(column=1, row=1)
@@ -66,6 +72,9 @@ email_input.insert(tk.END, "dummyemail@gmail.com")
 password_input = tk.Entry(width=35)
 password_input.grid(column=1, row=3)
 
+length_of_password_input = tk.Entry(width=35)
+length_of_password_input.grid(column=1, row=4)
+length_of_password_input.insert(0, "10")
 
 # Buttons
 generate_password_button = tk.Button(
@@ -73,7 +82,22 @@ generate_password_button = tk.Button(
 generate_password_button.grid(column=2, row=3)
 
 add_password_button = tk.Button(text="Add", width=35, command=save_password)
-add_password_button.grid(column=1, row=4)
+add_password_button.grid(column=1, row=8)
 
+# Checkboxes
+allow_numbers = tk.BooleanVar()
+allow_numbers_checkbox = tk.Checkbutton(
+    text="Allow numbers? ", variable=allow_numbers)
+allow_numbers_checkbox.grid(column=1, row=5)
+
+allow_symbols = tk.BooleanVar()
+allow_symbols_checkbox = tk.Checkbutton(
+    text="Allow symbols? ", variable=allow_symbols)
+allow_symbols_checkbox.grid(column=1, row=6)
+
+allow_uppercase = tk.BooleanVar()
+allow_uppercase_checkbox = tk.Checkbutton(
+    text="Allow uppercase? ", variable=allow_uppercase)
+allow_uppercase_checkbox.grid(column=1, row=7)
 
 window.mainloop()
