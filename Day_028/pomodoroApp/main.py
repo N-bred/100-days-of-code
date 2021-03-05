@@ -60,42 +60,41 @@ def count_down(count):
     else:
         start_timer()
         mark = ""
-        work_sessions = (math.floor(reps/2)
+        work_sessions = (math.floor(reps/2))
         for _ in range(work_sessions):
             mark += "✔"
         check_marks.config(text=mark)
 
 
-
 # UI
 
 
-window=tk.Tk()
+window = tk.Tk()
 window.title("Pomodoro")
 window.config(padx=100, pady=50, bg=YELLOW)
 
 
-title_label=tk.Label(text="Timer", fg=GREEN, font=(FONT_NAME, 50), bg=YELLOW)
+title_label = tk.Label(text="Timer", fg=GREEN, font=(FONT_NAME, 50), bg=YELLOW)
 title_label.grid(column=1, row=0)
 
-canvas=tk.Canvas(width=200, height=224, bg=YELLOW, highlightthickness=0)
-tomato_image=tk.PhotoImage(file="tomato.png")
+canvas = tk.Canvas(width=200, height=224, bg=YELLOW, highlightthickness=0)
+tomato_image = tk.PhotoImage(file="tomato.png")
 canvas.create_image(100, 112, image=tomato_image)
-timer_text=canvas.create_text(100, 130, text="00:00", fill="white",
+timer_text = canvas.create_text(100, 130, text="00:00", fill="white",
                                 font=(FONT_NAME, 35, "bold"))
 canvas.grid(column=1, row=1)
 
 
-start_button=tk.Button(
+start_button = tk.Button(
     text="Start",  highlightthickness=0, command=start_timer)
-reset_button=tk.Button(
-    text="Reset",  highlightthickness=0, command=reset_button)
+reset_button = tk.Button(
+    text="Reset",  highlightthickness=0, command=reset_timer)
 
 start_button.grid(column=0, row=2)
 reset_button.grid(column=2, row=2)
 
 
-check_marks=tk.Label(fg=GREEN, bg=YELLOW)
+check_marks = tk.Label(fg=GREEN, bg=YELLOW)
 check_marks.grid(column=1, row=3)
 
 
