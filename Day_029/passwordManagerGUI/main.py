@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 import math
 from passwordGenerator import create_random_password
 
@@ -19,12 +20,33 @@ def generate_password():
 
 
 def save_password():
-    text = '|'.join(
-        [website_input.get(), email_input.get(), password_input.get()])
+    if validate_inputs() is False:
+        return
+
+    website = website_input.get()
+    email = email_input.get()
+    password = password_input.get()
+
+    text = '|'.join([website, email, password])
+
+    is_ok = messagebox.askokcancel(
+        title=website, message=f"These are the details entered: \nEmail: {email}\nPassword: {password}.\nIs it ok to save?")
+
+    if is_ok is False:
+        return
+
     with open("saved_passwords.txt", "a+") as file:
         file.writelines(text + "\n")
         file.close()
+
     clear_inputs()
+
+
+def validate_inputs():
+    if website_input.get() == "" or email_input.get() == "" or password_input.get() == "" or int(length_of_password_input.get()) < 1:
+        messagebox.showerror(title="Error", message="No empty inputs allowed")
+        return False
+    return True
 
 
 def clear_inputs():
