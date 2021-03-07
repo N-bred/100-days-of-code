@@ -3,8 +3,66 @@ from tkinter import messagebox
 import math
 from passwordGenerator import create_random_password
 import pyperclip
+import json
 
 WIDTH, HEIGHT = 200, 200
+FILE_NAME = "saved_passwords.json"
+
+
+# ---------------------------- MANAGING THE FLOW ------------------------------- #
+
+
+def create_file():
+    with open(FILE_NAME, "w+") as file:
+        file.write(json.dumps([]))
+        file.close()
+
+
+def check_if_file_exists_or_create():
+    try:
+        with open(FILE_NAME) as file:
+            json.loads(file.read())
+            file.close()
+    except FileNotFoundError:
+        create_file()
+    except json.JSONDecodeError:
+        create_file()
+    else:
+        return True
+
+
+check_if_file_exists_or_create()
+
+
+def get_saved_passwords():
+    file = open(FILE_NAME)
+    json_data = json.loads(file.read())
+    file.close()
+    return json_data
+
+
+saved_passwords_data = get_saved_passwords()
+
+
+# ---------------------------- DATA FORMATTER ------------------------------- #
+
+def data_formatter():
+    data = {
+        "website": website_input.get(),
+        "email": email_input.get(),
+        "password": password_input.get()
+    }
+    return data
+
+
+def merge_data(data):
+    saved_passwords_data.append(data)
+
+
+def save_data_to_json():
+    with open(FILE_NAME, "w+") as file:
+        file.write(json.dumps(saved_passwords_data))
+        file.close()
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 
@@ -24,28 +82,24 @@ def save_password():
     if validate_inputs() is False:
         return
 
-    website = website_input.get()
-    email = email_input.get()
-    password = password_input.get()
-
-    text = '|'.join([website, email, password])
+    data = data_formatter()
 
     is_ok = messagebox.askokcancel(
-        title=website, message=f"These are the details entered: \nEmail: {email}\nPassword: {password}.\nIs it ok to save?")
+        title=data["website"], message=f"These are the details entered: \nEmail: {data['email']}\nPassword: {data['password']}.\nIs it ok to save?")
 
     if is_ok is False:
         return
 
-    with open("saved_passwords.txt", "a+") as file:
-        file.writelines(text + "\n")
-        file.close()
-
+    merge_data(data)
+    save_data_to_json()
     clear_inputs()
 
-    pyperclip.copy(password)
+    pyperclip.copy(data['password'])
     messagebox.showinfo(
         title="Copied!", message="Password copied to the clipboard!")
 
+
+# ---------------------------- HANDLING INPUTS ------------------------------- #
 
 def validate_inputs():
     if website_input.get() == "" or email_input.get() == "" or password_input.get() == "" or int(length_of_password_input.get()) < 1:
@@ -58,6 +112,8 @@ def clear_inputs():
     website_input.delete(0, tk.END)
     email_input.delete(0, tk.END)
     password_input.delete(0, tk.END)
+
+# ---------------------------- MAIN CALLER ------------------------------- #
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -108,7 +164,8 @@ generate_password_button = tk.Button(
     text="Generate Password", command=generate_password)
 generate_password_button.grid(column=2, row=3)
 
-add_password_button = tk.Button(text="Add", width=35, command=save_password)
+add_password_button = tk.Button(
+    text="Add", width=35, command=save_password)
 add_password_button.grid(column=1, row=8)
 
 # Checkboxes
