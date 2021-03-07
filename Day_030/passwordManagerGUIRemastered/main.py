@@ -43,8 +43,8 @@ def get_saved_passwords():
 
 saved_passwords_data = get_saved_passwords()
 
-
 # ---------------------------- DATA FORMATTER ------------------------------- #
+
 
 def data_formatter():
     data = {
@@ -98,8 +98,8 @@ def save_password():
     messagebox.showinfo(
         title="Copied!", message="Password copied to the clipboard!")
 
-
 # ---------------------------- HANDLING INPUTS ------------------------------- #
+
 
 def validate_inputs():
     if website_input.get() == "" or email_input.get() == "" or password_input.get() == "" or int(length_of_password_input.get()) < 1:
@@ -112,6 +112,25 @@ def clear_inputs():
     website_input.delete(0, tk.END)
     email_input.delete(0, tk.END)
     password_input.delete(0, tk.END)
+
+# ---------------------------- HANDLE SEARCH ------------------------------- #
+
+
+def search_in_list(arr, cb):
+    for i in arr:
+        if cb(i):
+            return i
+    raise StopIteration
+
+
+def search_data():
+    try:
+        registry = search_in_list(
+            saved_passwords_data, lambda x: True if x['website'] == website_input.get() else False)
+    except StopIteration:
+        return messagebox.showerror(title="Registry not found", message="The website wasn't found in the registry")
+    else:
+        return messagebox.showinfo(title=registry['website'], message=f"Email: {registry['email']}\nPassword: {registry['password']}")
 
 # ---------------------------- MAIN CALLER ------------------------------- #
 
@@ -160,6 +179,10 @@ length_of_password_input.grid(column=1, row=4)
 length_of_password_input.insert(0, "10")
 
 # Buttons
+search_button = tk.Button(
+    text="Search", command=search_data)
+search_button.grid(column=2, row=1)
+
 generate_password_button = tk.Button(
     text="Generate Password", command=generate_password)
 generate_password_button.grid(column=2, row=3)
