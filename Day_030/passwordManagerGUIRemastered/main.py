@@ -1,14 +1,12 @@
-import tkinter as tk
-from tkinter import messagebox
-import math
+from tkinter import messagebox, END
 from passwordGenerator import create_random_password
 import pyperclip
 import json
+from ui import initializeUi
 
 WIDTH, HEIGHT = 200, 200
 FILE_NAME = "saved_passwords.json"
-
-
+saved_passwords_data = []
 # ---------------------------- MANAGING THE FLOW ------------------------------- #
 
 
@@ -31,9 +29,6 @@ def check_if_file_exists_or_create():
         return True
 
 
-check_if_file_exists_or_create()
-
-
 def get_saved_passwords():
     file = open(FILE_NAME)
     json_data = json.loads(file.read())
@@ -41,16 +36,14 @@ def get_saved_passwords():
     return json_data
 
 
-saved_passwords_data = get_saved_passwords()
-
 # ---------------------------- DATA FORMATTER ------------------------------- #
 
 
-def data_formatter():
+def data_formatter(website, email, password):
     data = {
-        "website": website_input.get(),
-        "email": email_input.get(),
-        "password": password_input.get()
+        "website": website,
+        "email": email,
+        "password": password
     }
     return data
 
@@ -64,25 +57,31 @@ def save_data_to_json():
         file.write(json.dumps(saved_passwords_data))
         file.close()
 
+
+def format_info_message(email, password):
+    return f"Email: {email}\nPassword: {password}"
+
+
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 
 
-def generate_password():
-    random_password = create_random_password(n_of_digits=int(length_of_password_input.get()),
+def generate_password(length_of_password, allow_uppercase, allow_symbols, allow_numbers, password_input):
+    random_password = create_random_password(n_of_digits=int(length_of_password.get()),
                                              allow_uppercase=allow_uppercase.get(),
                                              allow_symbols=allow_symbols.get(),
                                              allow_numbers=allow_numbers.get())
-    password_input.delete(0, tk.END)
+    password_input.delete(0, END)
     password_input.insert(0, random_password)
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 
 
-def save_password():
-    if validate_inputs() is False:
+def save_password(website_input, email_input, password_input, length_of_password_input):
+    if validate_inputs(website_input, email_input, password_input, length_of_password_input) is False:
         return
 
-    data = data_formatter()
+    data = data_formatter(website=website_input.get(),
+                          email=email_input.get(), password=password_input.get())
 
     is_ok = messagebox.askokcancel(
         title=data["website"], message=f"These are the details entered: \nEmail: {data['email']}\nPassword: {data['password']}.\nIs it ok to save?")
@@ -92,7 +91,8 @@ def save_password():
 
     merge_data(data)
     save_data_to_json()
-    clear_inputs()
+    clear_inputs(website_input=website_input,
+                 email_input=email_input, password_input=password_input)
 
     pyperclip.copy(data['password'])
     messagebox.showinfo(
@@ -101,110 +101,54 @@ def save_password():
 # ---------------------------- HANDLING INPUTS ------------------------------- #
 
 
-def validate_inputs():
+def validate_inputs(website_input, email_input, password_input, length_of_password_input):
     if website_input.get() == "" or email_input.get() == "" or password_input.get() == "" or int(length_of_password_input.get()) < 1:
         messagebox.showerror(title="Error", message="No empty inputs allowed")
         return False
     return True
 
 
-def clear_inputs():
-    website_input.delete(0, tk.END)
-    email_input.delete(0, tk.END)
-    password_input.delete(0, tk.END)
+def clear_inputs(website_input, email_input, password_input):
+    website_input.delete(0, END)
+    email_input.delete(0, END)
+    password_input.delete(0, END)
 
 # ---------------------------- HANDLE SEARCH ------------------------------- #
 
 
 def search_in_list(arr, cb):
-    for i in arr:
-        if cb(i):
-            return i
-    raise StopIteration
+    data = [i for i in arr if cb(i)]
+    if len(data) == 0:
+        raise ValueError
+    return data
 
 
-def search_data():
+def search_data(website_input):
     try:
-        registry = search_in_list(
+        data = search_in_list(
             saved_passwords_data, lambda x: True if x['website'] == website_input.get() else False)
-    except StopIteration:
+    except ValueError:
         return messagebox.showerror(title="Registry not found", message="The website wasn't found in the registry")
     else:
-        return messagebox.showinfo(title=registry['website'], message=f"Email: {registry['email']}\nPassword: {registry['password']}")
+        data_string = '\n\n'.join([format_info_message(
+            reg['email'], reg['password']) for reg in data])
+        return messagebox.showinfo(title=data[0]['website'], message=f"{data_string}")
+
 
 # ---------------------------- MAIN CALLER ------------------------------- #
 
 
-# ---------------------------- UI SETUP ------------------------------- #
+def main():
+    if __name__ == "__main__":
+        # Initialize Data
+        check_if_file_exists_or_create()
+        global saved_passwords_data
+        saved_passwords_data = get_saved_passwords()
+        # Initialize UI
+        window = initializeUi(width=WIDTH, height=HEIGHT,
+                              search_data=search_data, generate_password=generate_password, save_password=save_password)
+
+        window.mainloop()
 
 
-window = tk.Tk()
-window.title = "Password Manager"
-window.config(padx=20, pady=20, bg="#ffffff")
-
-lock_image = tk.PhotoImage(file="logo.png")
-
-canvas = tk.Canvas(width=WIDTH, height=HEIGHT, bg="#ffffff")
-canvas.create_image(math.floor(WIDTH/2),
-                    math.floor(HEIGHT/2), image=lock_image)
-canvas.grid(column=1, row=0)
-
-# Labels
-website_label = tk.Label(text="Website")
-website_label.grid(column=0, row=1)
-
-email_label = tk.Label(text="Email/Username")
-email_label.grid(column=0, row=2)
-
-password_label = tk.Label(text="Password")
-password_label.grid(column=0, row=3)
-
-length_of_password = tk.Label(text="Length of Password")
-length_of_password.grid(column=0, row=4)
-
-# Entries
-website_input = tk.Entry(width=35)
-website_input.grid(column=1, row=1)
-website_input.focus()
-
-email_input = tk.Entry(width=35)
-email_input.grid(column=1, row=2)
-email_input.insert(tk.END, "dummyemail@gmail.com")
-
-password_input = tk.Entry(width=35)
-password_input.grid(column=1, row=3)
-
-length_of_password_input = tk.Entry(width=35)
-length_of_password_input.grid(column=1, row=4)
-length_of_password_input.insert(0, "10")
-
-# Buttons
-search_button = tk.Button(
-    text="Search", command=search_data)
-search_button.grid(column=2, row=1)
-
-generate_password_button = tk.Button(
-    text="Generate Password", command=generate_password)
-generate_password_button.grid(column=2, row=3)
-
-add_password_button = tk.Button(
-    text="Add", width=35, command=save_password)
-add_password_button.grid(column=1, row=8)
-
-# Checkboxes
-allow_numbers = tk.BooleanVar()
-allow_numbers_checkbox = tk.Checkbutton(
-    text="Allow numbers? ", variable=allow_numbers)
-allow_numbers_checkbox.grid(column=1, row=5)
-
-allow_symbols = tk.BooleanVar()
-allow_symbols_checkbox = tk.Checkbutton(
-    text="Allow symbols? ", variable=allow_symbols)
-allow_symbols_checkbox.grid(column=1, row=6)
-
-allow_uppercase = tk.BooleanVar()
-allow_uppercase_checkbox = tk.Checkbutton(
-    text="Allow uppercase? ", variable=allow_uppercase)
-allow_uppercase_checkbox.grid(column=1, row=7)
-
-window.mainloop()
+main()
