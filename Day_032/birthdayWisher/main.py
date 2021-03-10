@@ -34,9 +34,14 @@ def pick_random_quoute():
         return random.choice(file.readlines())
 
 
-for birth in regs:
-    if check_dates(date1=birth):
-        random_quote = pick_random_quoute()
-        letter = make_letter(birth["name"], random_quote)
-        smtp_handler.send_email(
-            birth["email"], f"Subject: Happy Birthay!\n\n{letter}")
+def main():
+
+    for birth in regs:
+        if check_dates(date1=birth):
+            random_quote = pick_random_quoute()
+            letter = make_letter(birth["name"], random_quote)
+            smtp_handler.send_email(
+                birth["email"], f"Subject: Happy Birthay!\n\n{letter}")
+
+
+main()
