@@ -9,9 +9,6 @@ my_email = "dummyemail@gmail.com"
 password = "123456"
 smtp_handler = SmtpHandler(GOOGLE_SMTP, 567, my_email, password)
 
-birthdays = pd.read_csv("birthdays.csv")
-regs = birthdays.to_dict(orient="records")
-
 
 def check_dates(date1, date2=dt.datetime.now()):
     if date2.month == date1["month"] and date2.day == date1["day"]:
@@ -35,13 +32,16 @@ def pick_random_quoute():
 
 
 def main():
-
-    for birth in regs:
-        if check_dates(date1=birth):
-            random_quote = pick_random_quoute()
-            letter = make_letter(birth["name"], random_quote)
-            smtp_handler.send_email(
-                birth["email"], f"Subject: Happy Birthay!\n\n{letter}")
+    if __name__ == "__main__":
+        birthdays = pd.read_csv("birthdays.csv")
+        regs = birthdays.to_dict(orient="records")
+        for birth in regs:
+            if check_dates(date1=birth):
+                random_quote = pick_random_quoute()
+                letter = make_letter(birth["name"], random_quote)
+                print(letter)
+                smtp_handler.send_email(
+                    birth["email"], f"Subject: Happy Birthay!\n\n{letter}")
 
 
 main()
