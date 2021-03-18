@@ -25,7 +25,7 @@ class Ui:
 
     def set_labels(self):
         self.score_label = Label(text=f"Score: ", font=(
-            "Arial", 18, "bold"), fg="#fff", bg=THEME_COLOR, padx=20, pady=20)
+            "Arial", 16, "bold"), fg="#fff", bg=THEME_COLOR, padx=20, pady=20)
         self.score_label.grid(column=1, row=0)
 
     def set_score(self, score: str):
