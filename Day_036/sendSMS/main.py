@@ -7,7 +7,7 @@ API_ENDPOINT = "http://api.openweathermap.org/data/2.5/onecall"
 
 PARAMS = {
     "lat": "4.569951",
-    "lon": "-74.100540",
+    "lon": "-74.100541",
     "appid": API_KEY,
     "exclude": "current,minutely,daily"
 }
