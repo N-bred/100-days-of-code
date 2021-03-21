@@ -1,29 +1,50 @@
 from dotenv import load_dotenv
 import os
 import requests
+from datetime import datetime, timedelta
 load_dotenv()
 
-
 STOCK = "TSLA"
-COMPANY_NAME = "Tesla Inc"
+COMPANY_NAME = "Tesla"
 STOCK_API_KEY = os.environ.get("STOCK_API_KEY")
 STOCK_API_ENDPOINT = "https://www.alphavantage.co/query"
+NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
+NEWS_API_ENDPOINT = "https://newsapi.org/v2/everything"
+A_MONTH_AGO = (datetime.utcnow().replace(day=1) -
+               timedelta(days=1)).strftime("%Y-%m-%d")
 
-PARAMS = {
+STOCK_PARAMS = {
     "function": "TIME_SERIES_DAILY",
     "symbol": STOCK,
     "apikey": STOCK_API_KEY
 }
 
+NEWS_PARAMS = {
+    "q": COMPANY_NAME,
+    "from": A_MONTH_AGO,
+    "sortBy": "popularity",
+    "apiKey": NEWS_API_KEY
+}
 
-def make_request(url=STOCK_API_ENDPOINT, params=PARAMS):
+
+def make_request(url, params):
     req = requests.get(url, params)
     req.raise_for_status()
     return req.json()
 
 
-def make_message(percentage, direction="up"):
-    return f"{STOCK}: {direction}{percentage}%"
+def make_article(article):
+    return f"\nTitle: {article['title']}\nDescription: {article['description']}\nURL: {article['url']}\n"
+
+
+def make_message(percentage,  direction="up", articles=[]):
+    article_data = []
+    symbol = "UP 🔺"
+    if direction == "down":
+        symbol = "DOWN 🔻"
+    if len(articles) != 0:
+        article_data = [make_article(article) for article in articles]
+    return f"{STOCK}: {symbol} {percentage}%" + '\n\n' + '\n\n'.join(article_data)
 
 
 def format_data(data):
@@ -46,34 +67,15 @@ def eval_data(json_data):
 
 
 def main():
-    data = make_request()
+    data = make_request(STOCK_API_ENDPOINT, STOCK_PARAMS)
     value = eval_data(data)
     if type(value) is not bool:
-        message = make_message(value[0], value[1])
+        news = make_request(NEWS_API_ENDPOINT, NEWS_PARAMS)
+        articles = news["articles"][:3]
+        message = make_message(value[0], value[1], articles)
         return print(message)
     return print("No substantial changes")
 
 
 if __name__ == "__main__":
     main()
-
-# STEP 1: Use https://www.alphavantage.co
-# When STOCK price increase/decreases by 5% between yesterday and the day before yesterday then print("Get News").
-
-# STEP 2: Use https://newsapi.org
-# Instead of printing ("Get News"), actually get the first 3 news pieces for the COMPANY_NAME.
-
-# STEP 3: Use https://www.twilio.com
-# Send a seperate message with the percentage change and each article's title and description to your phone number.
-
-
-# Optional: Format the SMS message like this:
-"""
-TSLA: 🔺2%
-Headline: Were Hedge Funds Right About Piling Into Tesla Inc. (TSLA)?. 
-Brief: We at Insider Monkey have gone over 821 13F filings that hedge funds and prominent investors are required to file by the SEC The 13F filings show the funds' and investors' portfolio positions as of March 31st, near the height of the coronavirus market crash.
-or
-"TSLA: 🔻5%
-Headline: Were Hedge Funds Right About Piling Into Tesla Inc. (TSLA)?. 
-Brief: We at Insider Monkey have gone over 821 13F filings that hedge funds and prominent investors are required to file by the SEC The 13F filings show the funds' and investors' portfolio positions as of March 31st, near the height of the coronavirus market crash.
-"""
