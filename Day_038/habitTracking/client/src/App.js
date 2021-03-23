@@ -1,25 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react'
+import TypesDisplay from './components/typesDisplay/TypesDisplay'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import HabitDisplay from './components/habitDisplay/HabitDisplay'
+
+import './App.css'
+
+async function makeRequest(url, params) {
+  const req = await fetch(url)
+  const res = await req.json()
+  return res
 }
 
-export default App;
+function App() {
+  const [types, setTypes] = useState([])
+  const [currentType, setCurrentType] = useState('')
+  const [habits, setHabits] = useState([])
+
+  const makeTypesRequest = async () => {
+    const typesData = await makeRequest('http://localhost:5000/api/types')
+    setTypes(typesData)
+  }
+
+  const makehabitsRequest = async (type) => {
+    const habitData = await makeRequest(`http://localhost:5000/api/type/${type}`)
+    setHabits(habitData)
+  }
+
+  useEffect(() => {
+    makeTypesRequest()
+  }, [])
+
+  return (
+    <div className='App'>
+      <TypesDisplay types={types} setHabits={makehabitsRequest} setCurrentType={setCurrentType} />
+      <HabitDisplay type={currentType} data={habits}></HabitDisplay>
+    </div>
+  )
+}
+
+export default App
