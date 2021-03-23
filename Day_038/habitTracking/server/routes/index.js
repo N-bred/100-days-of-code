@@ -3,6 +3,7 @@ const router = express.Router()
 const getFile = require('../utils/getFile')
 const resolveLocalPath = require('../utils/resolveLocalPath')
 const createLocalFile = require('../utils/createLocalFile')
+const makeYearsDate = require('../makeDates')
 const fs = require('fs/promises')
 
 router.get('/', async (req, res) => {
@@ -45,15 +46,29 @@ router.post('/createCategory', async (req, res) => {
   }
 
   try {
-    await createLocalFile(`../data/${type}.json`, JSON.stringify([]))
+    const dates = makeYearsDate()
+    const info = dates.map((date, id) => {
+      return {
+        id,
+        name: '',
+        date,
+        quantity: 0,
+      }
+    })
+
+    await createLocalFile(`../data/${type}.json`, JSON.stringify(info))
+
+    // Good
     const allData = await getFile(resolveLocalPath('../data/all.json'))
     const allDataJson = JSON.parse(allData)
     const createdType = {
       type,
       color: color || 'blue',
     }
-    allDataJson.push(category)
+    allDataJson.push(createdType)
+
     await createLocalFile('../data/all.json', JSON.stringify(allDataJson))
+
     res.json({ result: 'type created', type: createdType }).status(201)
   } catch (e) {
     console.log(e)
