@@ -9,17 +9,13 @@ function preload() {
 }
 
 function setup() {
+  // Canvas
   const cnv = createCanvas(600, 480)
   cnv.parent('canvasParent')
-  cnv.mousePressed(playAudio)
-}
-
-function playAudio() {
-  if (!song.isPlaying()) {
-    song.play()
-  } else {
-    song.pause()
-  }
+  cnv.mousePressed(() => playAudio(song))
+  // Volume Slider
+  const slider = createVolumeSlider()
+  slider.input(() => changeVolume(song, slider))
 }
 
 function draw() {
