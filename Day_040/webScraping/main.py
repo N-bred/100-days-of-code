@@ -13,3 +13,12 @@ def get_info(element):
         "id": element["id"].split("_")[1],
         "score": int(element.text.split(" ")[0])
     }
+
+
+def parse_article(element):
+    el = element.find(class_="storylink")
+    return f"""
+    Title: {el.text}
+
+    URL: {el["href"]}
+    """
