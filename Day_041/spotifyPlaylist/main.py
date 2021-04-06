@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import spotipy
 from spotipy.client import Spotify
 from spotipy.oauth2 import SpotifyOAuth
-import pprint
+
 
 scope = "playlist-modify-private"
 URL = "https://www.billboard.com/charts/hot-100/"
@@ -48,25 +48,33 @@ def format_spotify_response(item):
 
 
 def make_spotify_request(sp: Spotify, query, reqType, name):
-    result = [item for item in sp.search(q=query)[
-        "tracks"]["items"] if item["type"] == reqType and item["name"].lower() == name.lower()]
-    if (len(result) == 0):
-        return f"query: {query} and name: {name} not found"
-    return format_spotify_response(result[0])
+    result = None
+    request = sp.search(q=query)["tracks"]["items"]
+    if len(request) == 0:
+        return
+    for item in request:
+        if item["type"] == reqType and item["name"].lower() == name.lower():
+            result = format_spotify_response(item)
+    return result
 
 
 def main():
-
-    # date = input("Which year would you like to travel? (YYYY-MM-DD): ")
-    date = "2000-08-15"
+    date = input("Which year would you like to travel? (YYYY-MM-DD): ")
     if (date.count("-") > 3):
         return print("Invalid Date")
     load_dotenv()
-    billboard = get_100_billboard(date)[:5]
+    billboard = get_100_billboard(date)
+
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+
     songs = [make_spotify_request(sp,  (song["song_name"] + " " +
                                         song["artist_name"]).replace(' ', '+'), "track", song["song_name"]) for song in billboard]
-    pprint.pprint(songs)
+
+    playlist = sp.user_playlist_create(
+        environ["SPOTIFY_USER_ID"], f"{date} Billboard 100", False, description=f"Playlist with the top 100 songs from {date}")
+
+    sp.user_playlist_add_tracks(environ["SPOTIFY_USER_ID"], playlist["id"], [
+                                song["uri"] for song in songs if song is not None])
 
 
 if __name__ == '__main__':
