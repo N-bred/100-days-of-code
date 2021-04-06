@@ -1,6 +1,11 @@
 from bs4 import BeautifulSoup
 import requests
+from os import environ
+from dotenv import load_dotenv
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
 
+scope = "playlist-modify-private"
 URL = "https://www.billboard.com/charts/hot-100/"
 
 
@@ -28,11 +33,17 @@ def get_100_billboard(date):
 
 
 def main():
-    date = input("Which year would you like to travel? (YYYY-MM-DD): ")
-    if (date.count("-") > 3):
-        return print("Invalid Date")
-    billboard = get_100_billboard(date)
-    print(billboard)
+
+    # date = input("Which year would you like to travel? (YYYY-MM-DD): ")
+    # if (date.count("-") > 3):
+    #     return print("Invalid Date")
+    load_dotenv()
+    # billboard = get_100_billboard(date)
+    # print(billboard)
+
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+    results = sp.current_user()
+    print(results)
 
 
 if __name__ == '__main__':
