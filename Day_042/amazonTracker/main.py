@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-
+from time import sleep
 
 URI = "https://www.amazon.com/Razer-Kraken-Ultralight-Gaming-Headset/dp/B07RMC5BRL/ref=sr_1_3?dchild=1&keywords=gaming+headset&qid=1617917049&sr=8-3"
 HEADERS = {
@@ -16,6 +16,8 @@ HEADERS = {
     "Cache-Control": "max-age=0"
 }
 
+TRESHOLD = 41
+
 
 def make_request(url, **kwargs):
     req = requests.get(url, **kwargs)
@@ -24,10 +26,25 @@ def make_request(url, **kwargs):
     return res
 
 
+def get_prices(markup):
+    beautifulSoup = BeautifulSoup(markup, features="lxml")
+    price = beautifulSoup.find(
+        "span", class_="a-size-medium a-color-price priceBlockBuyingPriceString")
+    shipping_container = beautifulSoup.find(
+        "span", id="ourprice_shippingmessage")
+    shipping_price = shipping_container.find(
+        "span", class_="a-size-base a-color-secondary")
+    return {"price": float(price.getText()[1:]), "shipping_price": shipping_price.getText()}
+
+
 def main():
     req = make_request(URI, headers=HEADERS)
-    beautifulSoup = BeautifulSoup(req, features="lxml")
+    prices = get_prices(req)
+    if (prices["price"] <= TRESHOLD):
+        print("Buy Now!")
 
 
 if __name__ == '__main__':
-    main()
+    while True:
+        main()
+        sleep(2)
